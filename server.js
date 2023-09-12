@@ -16,7 +16,7 @@ const serverOptions = {
 }
 const messageList = [];
 const userList = [];
-const greeting = [{clientUserName: 'Piep´s Server', message: 'Willkommen auf unserem Server "piep´s pieps!!!" <br> Bitte halte dich an unsere Regeln. <br> und jetzt Viel Spaß... "piep´s piep´s!!!'}]
+const greeting = [{clientUserName: 'SERVER_CLIENT_NAME', message: 'YOUR_WELLCOME_MSG'}]
 //------------------------------------------------------------------------
 
 // Middleware

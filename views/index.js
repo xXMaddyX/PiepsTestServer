@@ -10,8 +10,23 @@ const userNameInput = document.getElementById('username-input');
 const userNameInputBtn = document.getElementById('unsername-input-button');
 //------------------------------------------------------------------------
 
-//User Infos
+//Username
 let clientUserName = 'User';
+//------------------------------------------------------------------------
+
+//Load User from Local
+const loadUserNameFromLocal = () => {
+    if (localStorage.getItem('PiepsChat') === null) {
+        console.log('no Username set');
+    } else {
+        let loadUsername = localStorage.getItem('PiepsChat');
+        clientUserName = loadUsername;
+    }
+};
+//------------------------------------------------------------------------
+
+//Send UserName to Server
+loadUserNameFromLocal();
 socket.emit('send-username', clientUserName)
 //------------------------------------------------------------------------
 
@@ -87,7 +102,8 @@ userNameInputBtn.addEventListener('click', () => {
         console.log("Ungültiger Username")
     } else {
         clientUserName = userNameInput.value;
-    
+        socket.disconnect();
+        socket.connect();
         socket.emit('send-username', clientUserName)
         userNameInput.value = '';
         saveUserNameToLocal();
@@ -129,18 +145,34 @@ const saveUserNameToLocal = () => {
 };
 //------------------------------------------------------------------------
 
-//Load User from Local
-const loadUserNameFromLocal = () => {
-    if (localStorage.getItem('PiepsChat') === null) {
-        console.log('no Username set');
-    } else {
-        let loadUsername = localStorage.getItem('PiepsChat');
-        clientUserName = loadUsername;
+//User Listing
+// Listen for user list updates from the server
+socket.on('update-user', (updatedUserList) => {
+    userListData = updatedUserList.map(user => user.username);
+    updateUserListDisplay();
+});
+
+// Listen for user disconnect updates from the server
+socket.on('user-disconnect', (updatedUserList) => {
+    userListData = updatedUserList.map(user => user.username);
+    updateUserListDisplay();
+});
+
+const updateUserListDisplay = () => {
+    const userListLog = document.getElementById('user-list');
+    
+    // Clear previous user list display
+    userListLog.innerHTML = '';
+
+    // Loop through userListData and display each user
+    for (let user of userListData) {
+        const newLi = document.createElement('li');
+        newLi.innerText = user;
+        userListLog.appendChild(newLi);
     }
 };
 //------------------------------------------------------------------------
 
-//Function Calls
-loadUserNameFromLocal();
+//Function Call
 diplayUserList(userListData);
 getChatLogOnConnect();

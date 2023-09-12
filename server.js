@@ -11,8 +11,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 const serverOptions = {
-    port: 5000,
-    hostName: '2a02:810b:1040:46d0::701e'
+    port: 'YOUR_PORT',
+    hostName: 'YOUR_HOSTE_ADRESS'
 }
 const messageList = [];
 const userList = [];

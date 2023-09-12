@@ -3,7 +3,7 @@ const inputField = document.getElementById('input-field');
 const sendButton = document.getElementById('send-button');
 const chatLog = document.getElementById('chat-log');
 const userList = document.getElementById('user-list');
-const socket = io.connect('http://YOUR_URL_ADRESS/');
+const socket = io.connect('http://YOUR_HOST_ADRESS/');
 const userChangeBtn = document.getElementById('user-button');
 const userChangeWin = document.querySelector('.user-change');
 const userNameInput = document.getElementById('username-input');
@@ -36,8 +36,8 @@ let userListData = [];
 //------------------------------------------------------------------------
 
 //Function Event Listener Send Message
-function sendMessage() {
-    let messageText = inputField.value;
+const sendMessage = () => {
+    let messageText = escapeHTML(inputField.value);
     let message = {clientUserName, message: messageText};
     socket.emit('send-message', message);
     inputField.value = '';
@@ -56,9 +56,12 @@ inputField.addEventListener('keydown', (event) => {
 
 // Listen for messages from server
 socket.on('new-message', (message) => {
+    message.clientUserName = escapeHTML(message.clientUserName);
+    message.message = escapeHTML(message.message);
     messageLog.push(message);
     diplayTextUserInput(messageLog);
 });
+//------------------------------------------------------------------------
 
 //Display Chat Messages
 const diplayTextUserInput = (messageLog) => {
@@ -172,6 +175,20 @@ const updateUserListDisplay = () => {
     }
 };
 //------------------------------------------------------------------------
+
+//HTML escapeHTML
+const escapeHTML = (str) => {
+    return str.replace(/[&<>"']/g, function(m) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }[m];
+    });
+};
+
 
 //Function Call
 diplayUserList(userListData);

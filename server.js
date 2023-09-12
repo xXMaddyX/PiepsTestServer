@@ -11,11 +11,12 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 const serverOptions = {
-    port: YOUR_PORT,
-    hostName: 'YOUR_HOSTNAME'
+    port: 5000,
+    hostName: '2a02:810b:1040:46d0::701e'
 }
 const messageList = [];
 const userList = [];
+const greeting = [{clientUserName: 'Piep´s Server', message: 'Willkommen auf unserem Server "piep´s pieps!!!" <br> Bitte halte dich an unsere Regeln. <br> und jetzt Viel Spaß... "piep´s piep´s!!!'}]
 //------------------------------------------------------------------------
 
 // Middleware
@@ -26,8 +27,17 @@ app.use(bodyParser.json())
 // Socket.io Communication
 io.on('connection', (socket) => {
     console.log('Ein Benutzer hat sich verbunden.');
-    socket.on('send-username', (user) => {
-        console.log(`Ein Nutzer hat sich zu ${user} umbenannt`);
+    socket.on('send-username', (username) => {
+        console.log(`Ein Nutzer hat sich zu ${username} umbenannt`);
+
+        let user = {
+            id: socket.id,
+            username: username
+        };
+        userList.push(user);
+        io.emit('update-user', userList);
+        console.log(userList)
+        
     });
 
     // Listen to send events
@@ -41,11 +51,22 @@ io.on('connection', (socket) => {
     //Send Chat Log to new connecting clients
     socket.on('get-log', () => {
         socket.emit('chat-log', messageList);
-    })
+        socket.emit('chat-log', greeting);
+    });
 
     //MSG on disconnect
     socket.on('disconnect', () => {
         console.log('Ein Benutzer hat sich getrennt.');
+
+        for (let i = 0; i < userList.length; i++) {
+            if (userList[i].id == socket.id) {
+                userList.splice(i, 1)
+                console.log(userList)
+                break;
+            }
+        }
+        io.emit('user-disconnect', userList);
+
     });
 });
 //------------------------------------------------------------------------

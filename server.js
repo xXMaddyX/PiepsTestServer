@@ -4,24 +4,37 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const path = require('path');
 const socketIO = require('socket.io');
+const rateLimit = require("express-rate-limit");
 //------------------------------------------------------------------------
 
 //Init Main Needet Modules
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
+
 const serverOptions = {
     port: 'YOUR_PORT',
-    hostName: 'YOUR_HOSTE_ADRESS'
-}
+    hostName: 'YOUR_HOST_ADRESS'
+};
+
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 100
+});
+
 const messageList = [];
 const userList = [];
-const greeting = [{clientUserName: 'SERVER_CLIENT_NAME', message: 'YOUR_WELLCOME_MSG'}]
+const greeting = [{clientUserName: 'YOUR_SERVER_NAME', message: 'YOUR_WELCOME_MSG'}]
 //------------------------------------------------------------------------
 
 // Middleware
 app.use(express.static(path.join(__dirname, 'views')));
 app.use(bodyParser.json())
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Etwas ist schiefgelaufen!');
+});
+app.use(limiter);
 //------------------------------------------------------------------------
 
 // Socket.io Communication

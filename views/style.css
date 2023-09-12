@@ -5,6 +5,10 @@
     overflow: auto;
 }
 
+#nav {
+  margin-bottom: 2px;
+}
+
 .content {
   display: flex;
   flex-direction: column;
@@ -61,9 +65,10 @@
   background-color: rgb(185, 185, 185);
   border-radius: 20px;
   margin: 5px;
-  padding-left: 5px;
+  padding: 5px;
   max-width: 6em;
   box-shadow: 2px 2px 4px black;
+  text-align: center;
 }
 
 .content .center-content .chat-window {

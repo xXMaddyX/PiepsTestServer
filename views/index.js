@@ -3,7 +3,7 @@ const inputField = document.getElementById('input-field');
 const sendButton = document.getElementById('send-button');
 const chatLog = document.getElementById('chat-log');
 const userList = document.getElementById('user-list');
-const socket = io.connect('http://YOUR_HOST_ADRESS/');
+const socket = io.connect('http://your/serverAdress/');
 const userChangeBtn = document.getElementById('user-button');
 const userChangeWin = document.querySelector('.user-change');
 const userNameInput = document.getElementById('username-input');
@@ -66,18 +66,19 @@ socket.on('new-message', (message) => {
 //Display Chat Messages
 const diplayTextUserInput = (messageLog) => {
     const chatLog = document.getElementById('chat-log');
-    const message = messageLog[messageLog.length - 1];
-    const newLi = document.createElement('li');
+    chatLog.innerHTML = ''; // Leeren des ChatLogs im DOM
+    for (const message of messageLog) {
+        const newLi = document.createElement('li');
 
-    const userSpan = document.createElement('span');
-    userSpan.innerText = message.clientUserName + ': ';
-    userSpan.classList.add('blue-text')
+        const userSpan = document.createElement('span');
+        userSpan.innerText = message.clientUserName + ': ';
+        userSpan.classList.add('blue-text')
 
-    newLi.appendChild(userSpan);
-    newLi.innerHTML += '<br>' + message.message;
-    
-    chatLog.appendChild(newLi);
-
+        newLi.appendChild(userSpan);
+        newLi.innerHTML += '<br>' + message.message;
+        
+        chatLog.appendChild(newLi);
+    }
     chatLog.scrollTop = chatLog.scrollHeight;
 }
 //------------------------------------------------------------------------
@@ -117,27 +118,13 @@ userNameInputBtn.addEventListener('click', () => {
 //------------------------------------------------------------------------
 //Get Userlist on connect
 const getChatLogOnConnect = () => {
+    messageLog = []; // Leeren des Arrays
     socket.emit('get-log');
     socket.on('chat-log', (resChatLog) => {
         for (let msg of resChatLog) {
             messageLog.push(msg);
         }
-
-        for (let currentMessage of messageLog) {
-            const chatLog = document.getElementById('chat-log');
-            const newLi = document.createElement('li');
-
-            const userSpan = document.createElement('span');
-            userSpan.innerText = currentMessage.clientUserName + ': ';
-            userSpan.classList.add('blue-text')
-
-            newLi.appendChild(userSpan);
-            newLi.innerHTML += '<br>' + currentMessage.message;
-    
-            chatLog.appendChild(newLi);
-
-            chatLog.scrollTop = chatLog.scrollHeight;
-        }
+        diplayTextUserInput(messageLog); // Diese Zeile wurde verschoben
     });
 };
 //------------------------------------------------------------------------
